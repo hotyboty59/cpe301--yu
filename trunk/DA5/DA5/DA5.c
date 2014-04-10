@@ -51,25 +51,26 @@ int main(void)
 	usart_init();
 	uint16_t temp;
 
-	
 	while(1)
 	{
 		
 		ADCSRA |= (1<<ADSC);				//begin conversion
 		while (!(ADCSRA&(1<<ADSC))==0);		//wait for end of conversion
-		temp = ADCH;
+		temp = (ADCH << 8) | ADCL; 					//store ADC value
 		//1 degree = 10mV, 0.1V = 0x05 in ADCH
 		//calculation for the temp
-		execute(0x05, temp/1000);					//4th digit
+		execute(0x05, temp%10000/1000);					//4th digit
 		execute(0x04, temp%1000/100);				//3rd digit
 		execute(0x03, temp%100/10 | (1<<7));		//2nd digit
 		execute(0x02, temp%10);						//1st digit
 
 		//usart_send to monitor
-		usart_send(temp/10);						// send temperature
+		usart_send(temp%10);						// send temperature
+		usart_send(temp%100/10);
 		usart_send(46);								//send a decimal point
-		usart_send(temp%1000);
-		usart_send(70);								// used for 'F' in Fahrenheit
+		usart_send(temp%1000/100);
+		usart_send(temp%10000/1000);
+
 		usart_send('\n');
 		_delay_ms(1000);							// Display temperature
 	}
