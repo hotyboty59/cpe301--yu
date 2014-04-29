@@ -41,7 +41,7 @@ int main()
         {
 				ADCSRA |= (1<<ADSC);	//begin conversion
 				while(!(ADCSRA &(1<<ADSC))==0);		//wait for end of conversion
-                temp=(ADCH<<8)|ADCL;
+				temp=(ADCH<<8)|ADCL;
 				//calculation for temperature
                 temp1 = temp%10;
                 temp2 = temp%100/10;
